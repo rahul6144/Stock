@@ -1,0 +1,412 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex));
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+</script>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Market Prediction</title>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto p-4">
+        <h1 class="text-3xl font-bold text-center mb-6">Stock Market Prediction</h1>
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="mb-4">
+                <label for="stockSymbol" class="block text-sm font-medium text-gray-700">Select Stock</label>
+                <select id="stockSymbol" class="mt-1 p-2 w-full border rounded-md">
+                    <option value="" disabled selected>Select a company</option>
+                    <option value="AAPL">Apple Inc. (AAPL)</option>
+                    <option value="MSFT">Microsoft Corporation (MSFT)</option>
+                    <option value="NVDA">Nvidia Corporation (NVDA)</option>
+                    <option value="AMZN">Amazon.com Inc. (AMZN)</option>
+                    <option value="META">Meta Platforms Inc. (META)</option>
+                    <option value="GOOGL">Alphabet Inc. (GOOGL)</option>
+                    <option value="TSM">Taiwan Semiconductor Manufacturing Co. (TSM)</option>
+                    <option value="JPM">JPMorgan Chase & Co. (JPM)</option>
+                    <option value="V">Visa Inc. (V)</option>
+                    <option value="KO">Coca-Cola Company (KO)</option>
+                    <option value="COST">Costco Wholesale Corp. (COST)</option>
+                    <option value="BAC">Bank of America Corp. (BAC)</option>
+                    <option value="AXP">American Express Co. (AXP)</option>
+                    <option value="CVX">Chevron Corporation (CVX)</option>
+                    <option value="MA">Mastercard Incorporated (MA)</option>
+                    <option value="NFLX">Netflix Inc. (NFLX)</option>
+                    <option value="TMO">Thermo Fisher Scientific Inc. (TMO)</option>
+                    <option value="STZ">Constellation Brands Inc. (STZ)</option>
+                    <option value="PYPL">PayPal Holdings Inc. (PYPL)</option>
+                    <option value="MELI">MercadoLibre Inc. (MELI)</option>
+                    <option value="RELIANCE.NSE">Reliance Industries Ltd. (RELIANCE.NSE)</option>
+                    <option value="HDFCBANK.NSE">HDFC Bank Ltd. (HDFCBANK.NSE)</option>
+                    <option value="ICICIBANK.NSE">ICICI Bank Ltd. (ICICIBANK.NSE)</option>
+                    <option value="INFY.NSE">Infosys Ltd. (INFY.NSE)</option>
+                    <option value="TCS.NSE">Tata Consultancy Services Ltd. (TCS.NSE)</option>
+                    <option value="BHARTIARTL.NSE">Bharti Airtel Ltd. (BHARTIARTL.NSE)</option>
+                    <option value="SBIN.NSE">State Bank of India (SBIN.NSE)</option>
+                    <option value="HINDUNILVR.NSE">Hindustan Unilever Ltd. (HINDUNILVR.NSE)</option>
+                    <option value="ITC.NSE">ITC Ltd. (ITC.NSE)</option>
+                    <option value="LT.NSE">Larsen & Toubro Ltd. (LT.NSE)</option>
+                    <option value="BAJFINANCE.NSE">Bajaj Finance Ltd. (BAJFINANCE.NSE)</option>
+                    <option value="ADANIPOWER.NSE">Adani Power Ltd. (ADANIPOWER.NSE)</option>
+                    <option value="VARUNBEV.NSE">Varun Beverages Ltd. (VARUNBEV.NSE)</option>
+                    <option value="TVSMOTOR.NSE">TVS Motor Company Ltd. (TVSMOTOR.NSE)</option>
+                    <option value="MAZDOCK.NSE">Mazagon Dock Shipbuilders Ltd. (MAZDOCK.NSE)</option>
+                    <option value="JSWSTEEL.NSE">JSW Steel Ltd. (JSWSTEEL.NSE)</option>
+                    <option value="BOSCHLTD.NSE">Bosch Ltd. (BOSCHLTD.NSE)</option>
+                    <option value="HAL.NSE">Hindustan Aeronautics Ltd. (HAL.NSE)</option>
+                    <option value="SOLARINDS.NSE">Solar Industries India Ltd. (SOLARINDS.NSE)</option>
+                    <option value="ROBLOX">Roblox Corporation (ROBLOX)</option>
+                    <option value="COIN">Coinbase Global Inc. (COIN)</option>
+                    <option value="HOOD">Robinhood Markets Inc. (HOOD)</option>
+                    <option value="YALA">Yalla Group Limited (YALA)</option>
+                    <option value="LZMH">LZ Technology (LZMH)</option>
+                    <option value="FUBO">FuboTV Inc. (FUBO)</option>
+                    <option value="ROOT">Root Inc. (ROOT)</option>
+                    <option value="GRAL">Grail Inc. (GRAL)</option>
+                    <option value="TDUP">ThredUp Inc. (TDUP)</option>
+                    <option value="CRWD">CrowdStrike Holdings Inc. (CRWD)</option>
+                    <option value="AEVA">Aeva Technologies Inc. (AEVA)</option>
+                </select>
+            </div>
+            <div class="mb-4">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Select Time Period</label>
+                <div class="flex space-x-2">
+                    <button onclick="setTimePeriod(7)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">1 Week</button>
+                    <button onclick="setTimePeriod(21)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">3 Weeks</button>
+                    <button onclick="setTimePeriod(30)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">1 Month</button>
+                    <button onclick="setTimePeriod(60)" class="bg-gray-200 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-300">2 Months</button>
+                    <button onclick="setTimePeriod(90)" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">3 Months</button>
+                </div>
+            </div>
+            <div class="flex space-x-2 mb-4">
+                <button onclick="predictStock()" class="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600">Predict</button>
+                <button onclick="executeTrade('buy')" class="bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600">Buy</button>
+                <button onclick="executeTrade('sell')" class="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600">Sell</button>
+            </div>
+            <div id="result" class="mt-4"></div>
+            <canvas id="stockChart" class="mt-6"></canvas>
+        </div>
+    </div>
+
+    <script>
+        // Alpha Vantage API key (replace with your own key from https://www.alphavantage.co)
+        const API_KEY = 'YOUR_API_KEY';
+
+        // Global variable to store chart instance and selected time period
+        let stockChart = null;
+        let selectedDays = 90; // Default to 90 days (3 months)
+        let latestStockData = null; // Store latest stock data for buy/sell recommendations
+
+        // Simple linear regression for prediction
+        function simpleLinearRegression(data) {
+            try {
+                const n = data.length;
+                if (n < 2) throw new Error('Insufficient data for regression');
+                let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+                for (let i = 0; i < n; i++) {
+                    sumX += i;
+                    sumY += data[i].price;
+                    sumXY += i * data[i].price;
+                    sumXX += i * i;
+                }
+                const slope = (n * sumXY - sumX * sumY) / (n * sumXX - sumX * sumX);
+                const intercept = (sumY - slope * sumX) / n;
+                return { slope, intercept };
+            } catch (error) {
+                console.error('Regression error:', error.message);
+                return null;
+            }
+        }
+
+        // Predict next day's price
+        function predictNextPrice(data) {
+            const regression = simpleLinearRegression(data);
+            if (!regression) return null;
+            const { slope, intercept } = regression;
+            return slope * data.length + intercept;
+        }
+
+        // Get buy/sell/hold recommendation
+        function getRecommendation(predictedPrice, currentPrice) {
+            const threshold = 0.02; // 2% threshold
+            const priceChange = (predictedPrice - currentPrice) / currentPrice;
+            if (priceChange > threshold) {
+                return 'Buy';
+            } else if (priceChange < -threshold) {
+                return 'Sell';
+            } else {
+                return 'Hold';
+            }
+        }
+
+        // Simulate trade execution
+        function executeTrade(action) {
+            const symbol = document.getElementById('stockSymbol').value;
+            if (!symbol) {
+                document.getElementById('result').innerHTML = '<p class="text-red-500">Please select a stock symbol!</p>';
+                return;
+            }
+            if (!latestStockData || latestStockData.length === 0) {
+                document.getElementById('result').innerHTML = '<p class="text-red-500">Please predict stock price first!</p>';
+                return;
+            }
+            const currentPrice = latestStockData[latestStockData.length - 1].price;
+            console.log(`${action.toUpperCase()} ${symbol} at ${currentPrice.toFixed(2)}`);
+            document.getElementById('result').innerHTML += `<p class="text-blue-600">${action.toUpperCase()} action executed for ${symbol} at ${currentPrice.toFixed(2)}</p>`;
+        }
+
+        // Format date to YYYY-MM-DD
+        function formatDate(date) {
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        // Get trading days for the specified number of days
+        function getTradingDays(numDays) {
+            const dates = [];
+            let currentDate = new Date();
+            let count = 0;
+            while (count < numDays) {
+                if (currentDate.getDay() !== 0 && currentDate.getDay() !== 6) { // Exclude Sat (6) and Sun (0)
+                    dates.push(formatDate(currentDate));
+                    count++;
+                }
+                currentDate.setDate(currentDate.getDate() - 1);
+            }
+            return dates.reverse(); // Oldest to newest
+        }
+
+        // Fetch stock data from Alpha Vantage
+        async function fetchStockData(symbol, days) {
+            try {
+                const response = await fetch(
+                    `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&outputsize=full&apikey=${API_KEY}`
+                );
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+                if (data['Error Message']) {
+                    throw new Error(data['Error Message']);
+                }
+                if (!data['Time Series (Daily)']) {
+                    throw new Error('No daily time series data available');
+                }
+
+                const timeSeries = data['Time Series (Daily)'];
+                const tradingDays = getTradingDays(days);
+                const stockData = tradingDays
+                    .filter(date => timeSeries[date])
+                    .map(date => ({
+                        date: date,
+                        price: parseFloat(timeSeries[date]['4. close'])
+                    }));
+
+                if (stockData.length < 2) {
+                    throw new Error('Not enough data points for prediction');
+                }
+                return stockData;
+            } catch (error) {
+                console.error('Fetch error:', error.message);
+                throw error;
+            }
+        }
+
+        // Render chart using Chart.js
+        function renderChart(data, symbol, predictedPrice, currency = 'USD') {
+            try {
+                const ctx = document.getElementById('stockChart').getContext('2d');
+                if (!ctx) throw new Error('Canvas context not found');
+                if (typeof Chart === 'undefined') throw new Error('Chart.js not loaded');
+
+                // Destroy previous chart instance if it exists
+                if (stockChart) {
+                    stockChart.destroy();
+                }
+
+                const labels = data.map(d => d.date);
+                const prices = data.map(d => d.price);
+                const nextDate = new Date(labels[labels.length - 1]);
+                nextDate.setDate(nextDate.getDate() + 1);
+                if (nextDate.getDay() === 0) nextDate.setDate(nextDate.getDate() + 1); // Skip Sunday
+                if (nextDate.getDay() === 6) nextDate.setDate(nextDate.getDate() + 2); // Skip Saturday
+                labels.push(formatDate(nextDate));
+                prices.push(predictedPrice);
+
+                stockChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: `${symbol} Stock Price (${currency})`,
+                            data: prices,
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                            fill: false,
+                            pointRadius: labels.length > 30 ? 2 : 4, // Smaller points for longer periods
+                            tension: 0.1
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            y: {
+                                beginAtZero: false,
+                                title: { display: true, text: `Price (${currency})` }
+                            },
+                            x: {
+                                title: { display: true, text: 'Date' },
+                                ticks: {
+                                    maxTicksLimit: 10, // Limit number of x-axis labels for readability
+                                    autoSkip: true
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: true },
+                            tooltip: { mode: 'index', intersect: false }
+                        }
+                    }
+                });
+            } catch (error) {
+                console.error('Chart rendering error:', error.message);
+                document.getElementById('result').innerHTML = '<p class="text-red-500">Error rendering chart: ' + error.message + '</p>';
+            }
+        }
+
+        // Set time period and trigger prediction
+        function setTimePeriod(days) {
+            selectedDays = days;
+            // Update button styles
+            document.querySelectorAll('.flex button').forEach(btn => {
+                btn.classList.remove('bg-blue-500', 'text-white');
+                btn.classList.add('bg-gray-200', 'text-gray-700');
+            });
+            document.querySelector(`button[onclick="setTimePeriod(${days})"]`).classList.add('bg-blue-500', 'text-white');
+            predictStock();
+        }
+
+        // Predict stock price
+        async function predictStock() {
+            try {
+                const symbol = document.getElementById('stockSymbol').value;
+                const resultDiv = document.getElementById('result');
+                if (!symbol) {
+                    resultDiv.innerHTML = '<p class="text-red-500">Please select a stock symbol!</p>';
+                    return;
+                }
+
+                // Determine currency based on symbol (NSE for Indian stocks)
+                const currency = symbol.endsWith('.NSE') ? 'INR' : 'USD';
+
+                resultDiv.innerHTML = '<p class="text-gray-500">Fetching data...</p>';
+                const data = await fetchStockData(symbol, selectedDays);
+                latestStockData = data; // Store data for buy/sell recommendations
+                const predictedPrice = predictNextPrice(data);
+                if (predictedPrice === null) {
+                    resultDiv.innerHTML = '<p class="text-red-500">Error calculating prediction!</p>';
+                    return;
+                }
+
+                const nextDate = new Date(data[data.length - 1].date);
+                nextDate.setDate(nextDate.getDate() + 1);
+                if (nextDate.getDay() === 0) nextDate.setDate(nextDate.getDate() + 1); // Skip Sunday
+                if (nextDate.getDay() === 6) nextDate.setDate(nextDate.getDate() + 2); // Skip Saturday
+
+                const currentPrice = data[data.length - 1].price;
+                const recommendation = getRecommendation(predictedPrice, currentPrice);
+                let recommendationClass = recommendation === 'Buy' ? 'text-green-600' : recommendation === 'Sell' ? 'text-red-600' : 'text-yellow-600';
+
+                resultDiv.innerHTML = `
+                    <p class="text-green-600">Predicted price for ${symbol} on ${formatDate(nextDate)}: ${currency} ${predictedPrice.toFixed(2)}</p>
+                    <p class="${recommendationClass}">Recommendation: ${recommendation}</p>
+                `;
+                renderChart(data, symbol, predictedPrice, currency);
+            } catch (error) {
+                console.error('Prediction error:', error.message);
+                document.getElementById('result').innerHTML = `<p class="text-red-500">Error: ${error.message}. Please try again later or check your API key.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
